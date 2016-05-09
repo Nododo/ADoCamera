@@ -32,7 +32,7 @@
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    [self customBottomBar];
+    
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         [self prepareCaptureSession];
     });
@@ -41,12 +41,10 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self customBottomBar];
-
 }
 
 -(void)viewDidAppear:(BOOL)animated{
     [super viewDidAppear:animated];
-    [self.captureSession startRunning];
 }
 
 -(void)viewDidDisappear:(BOOL)animated{
@@ -59,19 +57,20 @@
 }
 
 - (void)takePhoto:(UIButton *)btn {
+    self.takeBtn.hidden = YES;
+    self.takeBtn.backgroundColor = [UIColor purpleColor];
+    self.cancleBtn.hidden = YES;
+    self.remakeBtn.hidden = NO;
+    self.confirmBtn.hidden = NO;
     AVCaptureConnection *captureConnection=[self.captureStillImageOutput connectionWithMediaType:AVMediaTypeVideo];
     [self.captureStillImageOutput captureStillImageAsynchronouslyFromConnection:captureConnection completionHandler:^(CMSampleBufferRef imageDataSampleBuffer, NSError *error) {
         if (imageDataSampleBuffer) {
             NSData *imageData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageDataSampleBuffer];
             self.currentImage = [UIImage imageWithData:imageData];
             NSLog(@"%zd",imageData.length);
+            [self.captureSession stopRunning];
         }
     }];
-    [self.captureSession stopRunning];
-    self.takeBtn.hidden = YES;
-    self.cancleBtn.hidden = YES;
-    self.remakeBtn.hidden = NO;
-    self.confirmBtn.hidden = NO;
 }
 
 - (void)cancle:(UIButton *)btn {
@@ -131,10 +130,12 @@
     
     _captureVideoPreviewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:self.captureSession];
     self.preview.layer.masksToBounds = YES;
-    _captureVideoPreviewLayer.frame = self.view.layer.bounds;
+    _captureVideoPreviewLayer.frame = self.preview.bounds;
     _captureVideoPreviewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
+    
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.preview.layer addSublayer:_captureVideoPreviewLayer];
+        [self.captureSession startRunning];
     });
 }
 
