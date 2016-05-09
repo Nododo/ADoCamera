@@ -10,7 +10,9 @@
 #import "ViewController.h"
 #import "ADoCameraController.h"
 
-@interface ViewController ()
+@interface ViewController ()<ADoCameraControllerDelegate>
+
+@property (weak, nonatomic) IBOutlet UIImageView *photoView;
 
 @end
 
@@ -18,7 +20,12 @@
 
 - (IBAction)openCamera:(UIButton *)sender {
     ADoCameraController *camera = [[ADoCameraController alloc] init];
-    [self presentViewController:camera animated:YES completion:nil];
+    camera.cameraDelegate = self;
+    [self presentViewController:camera animated:NO completion:nil];
+}
+
+- (void)cameraController:(ADoCameraController *)camera didFinishPickingImage:(UIImage *)image {
+    self.photoView.image = image;
 }
 
 - (void)viewDidLoad {

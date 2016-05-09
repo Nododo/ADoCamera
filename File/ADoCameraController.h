@@ -8,6 +8,22 @@
 
 #import <UIKit/UIKit.h>
 
+@class ADoCameraController;
+
+@protocol ADoCameraControllerDelegate <NSObject>
+
+@required
+
+- (void)cameraController:(ADoCameraController *)camera didFinishPickingImage:(UIImage *)image;
+
+@optional
+
+- (void)cameraController:(ADoCameraController *)camera didFinishSavingWithError:(NSError *)error;
+
+@end
+
 @interface ADoCameraController : UIViewController
+
+@property (nonatomic,assign)id <ADoCameraControllerDelegate> cameraDelegate;
 
 @end
